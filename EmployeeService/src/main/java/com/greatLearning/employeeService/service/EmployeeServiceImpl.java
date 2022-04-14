@@ -1,14 +1,22 @@
 package com.greatLearning.employeeService.service;
 
 import java.util.List;
-
+import java.util.Optional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.greatLearning.employeeService.dao.EmployeeRepository;
 import com.greatLearning.employeeService.dao.RoleRepository;
 import com.greatLearning.employeeService.dao.UserRepository;
 import com.greatLearning.employeeService.entity.Employee;
+import com.greatLearning.employeeService.entity.Role;
+import com.greatLearning.employeeService.entity.User;
+import com.greatLearning.employeeService.service.EmployeeServiceImpl;
 import com.greatLearning.employeeService.service.*;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Service
 public class EmployeeServiceImpl<BCryptPasswordEncoder> implements EmployeeService {
@@ -25,24 +33,23 @@ public class EmployeeServiceImpl<BCryptPasswordEncoder> implements EmployeeServi
 		employeeRepository = theEmployeeRepository;
 	}
 
-@Override
-public List‹Employee› findAll() {
-return employeeRepository.findAll();
-}
+	@Override
+	public List<Employee> findAll() {
+		return employeeRepository.findAll();
+	}
 
-@Override
-public Employee findById(int theId) {
-Optional<Employee› result = employeeRepository.findById(theId);
-Employee theEmployee = null;
-if (result.isPresent()) {
-theEmployee = result.get();
-}
-else
-{
+	@Override
+	public Employee findById(int theId) {
+		Optional<Employee> result = employeeRepository.findById(theId);
+		Employee theEmployee = null;
+		if (result.isPresent()) {
+			theEmployee = result.get();
+		} else {
 // we didn't find the employee
-throw new RuntimeException("Did not find employee id - " + theId);
-return theEmployee;
-}
+			throw new RuntimeException("Did not find employee id - " + theId);
+		}
+		return theEmployee;
+	}
 
 	@Override
 	public void save(Employee theEmployee) {
@@ -54,25 +61,25 @@ return theEmployee;
 		employeeRepository.deleteById(theId);
 	}
 
-@Override
-public List‹Employee› searchByFirstName(String firstName) {
+	@Override
+	public List<Employee> searchByFirstName(String firstName) {
 // TODO Auto-generated method stub
-return employeeRepository.findByFirstNameContainsAllIgnoreCase(firstName);
+		return employeeRepository.findByFirstNameContainsAllIgnoreCase(firstName);
 	}
 
-@Override
-public List<Employee› sortByFirstName (String order) {
+	@Override
+	public List<Employee> sortByFirstName(String order) {
 // TODO Auto-generated method stub
-if(order.equals ("desc"))
-return employeeRepository.findAllByOrderByFirstNameDesc();
-else
-return employeeRepository.findAllByOrderByFirstNameAsc();
-}
+		if (order.equals("desc"))
+			return employeeRepository.findAllByOrderByFirstNameDesc();
+		else
+			return employeeRepository.findAllByOrderByFirstNameAsc();
+	}
 
 	@Override
 	public User saveUser(User user) {
 // TODO Auto-generated method stub
-		user.setPassword(bcryptEncoder.encode(user.getPassword()));
+		user.setPassword(((PasswordEncoder) bcryptEncoder).encode(user.getPassword()));
 		return userRepository.save(user);
 	}
 
@@ -87,4 +94,5 @@ return employeeRepository.findAllByOrderByFirstNameAsc();
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }
